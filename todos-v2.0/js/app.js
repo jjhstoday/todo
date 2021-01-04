@@ -8,20 +8,6 @@ const $clearBtn = document.querySelector('.btn');
 const $completedTodos = document.querySelector('.completed-todos');
 const $activeTodos = document.querySelector('.active-todos');
 
-
-// TODO: 서버로부터 데이터 취득 함수
-const fetchTodos = () => {
-  todos = [
-    { id: 1, content: 'HTML', completed: false },
-    { id: 2, content: 'CSS', completed: true },
-    { id: 3, content: 'Javascript', completed: false },
-  ];
-
-  todos = [...todos].sort((todo1, todo2) => todo2.id - todo1.id);
-
-  render();
-};
-
 // 브라우저 렌더링 함수
 const render = () => {
   $todos.innerHTML = todos.map(({ id, content, completed }) => 
@@ -38,7 +24,19 @@ const render = () => {
   if (!todos.length) $completeAll.firstElementChild.checked = false;
 };
 
-// Todo 추가 함수
+// TODO: 서버로부터 데이터 취득 함수
+const fetchTodos = () => {
+  todos = [
+    { id: 1, content: 'HTML', completed: false },
+    { id: 2, content: 'CSS', completed: true },
+    { id: 3, content: 'Javascript', completed: false },
+  ];
+
+  todos = [...todos].sort((todo1, todo2) => todo2.id - todo1.id);
+
+  render();
+};
+
 const addTodo = (() => {
   // generateId를 한번만 만들기 위해 자유 변수로 만듦
   // 오류 코드
@@ -52,26 +50,21 @@ const addTodo = (() => {
   };
 })();
 
-// 지우기 함수
 const removeTodo = id => {
   todos = todos.filter(todo => todo.id !== id);
-
   render();
 };
 
-// checkbox Toggle 함수
 const checkboxToggle = id => {
   todos = todos.map(todo => todo.id === id ? {...todo, completed: !todo.completed} : todo);
   render();
 };
 
-// completeAll 함수
 const completeAll = checked => {
   todos = todos.map(todo => ({...todo, completed: checked}));
   render();
 };
 
-// clearCompleted 함수
 const clearCompleted = () => {
   todos = todos.filter(todo => !todo.completed);
   render();
@@ -89,17 +82,17 @@ $inputTodo.onkeyup = e => {
   addTodo(content);
   // content = ''; -> e.target.value 원시 값을 참조하고 있기 때문에, value 값을 변경할 수 없다.
   $inputTodo.value = '';
-  $inputTodo.focus();
+  $inputTodo.focus(); // -> focus를 안넣어도 됨
 }
 
-// 지우기 버튼 이벤트 핸들러 등록
+// 지우기 버튼 이벤트 핸들러 등록 -> 이벤트 위임
 $todos.onclick = e => {
   if (!e.target.classList.contains('remove-todo')) return;
 
   removeTodo(+e.target.parentNode.id);
 };
 
-// checkbox toggle 이벤트 핸들러 등록
+// checkbox toggle 이벤트 핸들러 등록 -> 이벤트 위임
 $todos.onchange = e => checkboxToggle(+e.target.parentNode.id);
 
 // completeAll 버튼 이벤트 핸들러 등록
