@@ -68,10 +68,7 @@ const removeCompleted = () => {
 const seperateNav = target => {
   [...$nav.children].forEach(nav => nav.classList.toggle('active', nav === target));
 
-  // if (target.matches('.nav > li#all')) todos = todos.filter(todo => todo.completed || !todo.completed);
-  // if (target.matches('.nav > li#active')) todos = todos.filter(todo => !todo.completed);
-  // if (target.matches('.nav > li#completed')) todos = todos.filter(todo => todo.completed);
-
+  // nav 상태 따라 li 요소 style display 값 조정 방식
   if (target.matches('.nav > li#all')) todos = todos.map(todo => ({...todo, style: `display`}));
   if (target.matches('.nav > li#active')) todos = todos.map(todo => !todo.completed ? {...todo, style: `display`} : {...todo, style: `display: none`});
   if (target.matches('.nav > li#completed')) todos = todos.map(todo => todo.completed ? {...todo, style: `display`} : {...todo, style: `display: none`});
