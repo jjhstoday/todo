@@ -20,18 +20,52 @@ const render = () => {
   else if ($activeNav.classList.contains('active')) todosNav = todos.filter(todo => !todo.completed);
   else todosNav = todos.filter(todo => todo.completed);
 
-  $todos.innerHTML = todosNav.map(({ id, content, completed }) => 
-    `<li id="${id}" class="todo-item">
-      <input id="ck-${id}" class="checkbox" type="checkbox" ${completed ? 'checked' : ''}>
-      <label for="ck-${id}">${content}</label>
-      <i class="remove-todo far fa-times-circle"></i>
-    </li>`).join('');
+  // innerHTML 방법
+  // $todos.innerHTML = todosNav.map(({ id, content, completed }) => 
+  //   `<li id="${id}" class="todo-item">
+  //     <input id="ck-${id}" class="checkbox" type="checkbox" ${completed ? 'checked' : ''}>
+  //     <label for="ck-${id}">${content}</label>
+  //     <i class="remove-todo far fa-times-circle"></i>
+  //   </li>`).join('');
 
+  
+  // DocumentFragment 노드 생성 방법
+  const $fragment = document.createDocumentFragment();
+
+  $todos.textContent = '';
+  todosNav.forEach(({ id, content, completed }) => {
+    const $li = document.createElement('li');
+    $li.setAttribute('id', id);
+    $li.setAttribute('class', 'todo-item');
+
+    const $input = document.createElement('input');
+    $input.setAttribute('id', `ck-${id}`);
+    $input.setAttribute('class', 'checkbox');
+    $input.setAttribute('type', 'checkbox');
+    if (completed) $input.setAttribute('checked', 'checked');
+    else $input.removeAttribute('checked');
+
+    const $label = document.createElement('label');
+    $label.setAttribute('for', `ck-${id}`);
+    const $textNode = document.createTextNode(content);
+    $label.appendChild($textNode);
+
+    const $i = document.createElement('i');
+    $i.setAttribute('class', 'remove-todo far fa-times-circle');
+
+    $li.appendChild($input);
+    $li.appendChild($label);
+    $li.appendChild($i);
+
+    $fragment.appendChild($li);
+  });
+  $todos.appendChild($fragment);
+  
   $completedCount.textContent = todos.filter(todo => todo.completed).length;
   $activeCount.textContent = todos.filter(todo => !todo.completed).length;
-
+  
   // if (!todos.length) $completeAll.firstElementChild.checked = false;
-    
+  
   if (todos.map(todo => todo.completed ? 1 : 0).includes(0)) $completeAll.firstElementChild.checked = false;
   else $completeAll.firstElementChild.checked = true;
 };
