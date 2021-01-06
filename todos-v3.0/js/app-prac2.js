@@ -1,5 +1,4 @@
 let todos = [];
-let todosNav;
 
 // DOM nodes
 const $todoList = document.querySelector('.todos');
@@ -13,6 +12,8 @@ const $allNav = document.getElementById('all');
 const $activeNav = document.getElementById('active');
 
 const render = () => {
+  let todosNav = [];
+
   if ($allNav.classList.contains('active')) todosNav = todos;
   else if ($activeNav.classList.contains('active')) todosNav = todos.filter(todo => !todo.completed)
   else todosNav = todos.filter(todo => todo.completed);
@@ -50,11 +51,13 @@ const render = () => {
   $todoList.appendChild($fragment);
 
   // Clear completed <=> items left 카운팅
-  $completed.textContent = todos.filter(todo => todo.completed).length;
-  $active.textContent = todos.filter(todo => !todo.completed).length;
+  const completedLength = todos.filter(todo => todo.completed).length;
+  const unCompletedLength = todos.filter(todo => !todo.completed).length;
+  $completed.textContent = completedLength;
+  $active.textContent = unCompletedLength;
 
   // toggleTodo 상태에 따른 toggleAll 상태 변화
-  $toggleAll.checked = todos.filter(todo => todo.completed).length === todos.length;
+  $toggleAll.checked = completedLength === todos.length;
 
   if (!todos.length) $toggleAll.checked = false;
 };
