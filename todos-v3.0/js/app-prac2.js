@@ -54,8 +54,7 @@ const render = () => {
   $active.textContent = todos.filter(todo => !todo.completed).length;
 
   // toggleTodo 상태에 따른 toggleAll 상태 변화
-  if (todos.map(todo => todo.completed ? 1 : 0).includes(0)) $toggleAll.checked = false;
-  else $toggleAll.checked = true;
+  $toggleAll.checked = todos.filter(todo => todo.completed).length === todos.length;
 
   if (!todos.length) $toggleAll.checked = false;
 };
@@ -70,16 +69,14 @@ const fetchTodos = () => {
 
   // todos id 숫자 기준 내림차순 정렬
   todos = [...todos].sort((todo1, todo2) => todo2.id - todo1.id);
-
   render();
 };
 
 const addTodo = (() => {
-  const generateId = () => todos.length > 0 ? Math.max(...todos.map(todo => todo.id)) + 1 : 1;
+  const generateId = () => todos.length ? Math.max(...todos.map(todo => todo.id)) + 1 : 1;
   
   return content => {
     todos = [{ id: generateId(), content, completed: false }, ...todos];
-
     render();
   };
 })();
