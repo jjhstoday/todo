@@ -1,4 +1,5 @@
 let todos = [];
+let navState = 'all';
 
 // DOM nodes
 const $todoList = document.querySelector('.todos');
@@ -13,11 +14,12 @@ const $activeNav = document.getElementById('active');
 
 const render = () => {
   let todosNav = [];
-
-  if ($allNav.classList.contains('active')) todosNav = todos;
-  else if ($activeNav.classList.contains('active')) todosNav = todos.filter(todo => !todo.completed);
-  else todosNav = todos.filter(todo => todo.completed);
-
+  
+  const activeTodos = todos.filter(todo => !todo.completed);
+  const completedTodos = todos.filter(todo => todo.completed);
+  
+  todosNav = navState === 'all' ? todos : navState === 'active' ? activeTodos : completedTodos;
+  
   const $fragment = document.createDocumentFragment();
 
   $todoList.textContent = '';
@@ -48,13 +50,10 @@ const render = () => {
   })
   $todoList.appendChild($fragment);
 
-  const completedLength = todos.filter(todo => todo.completed).length;
-  const uncompletedLength = todos.filter(todo => !todo.completed).length;
+  $completedCount.textContent = completedTodos.length;
+  $activeCount.textContent = activeTodos.length;
 
-  $completedCount.textContent = completedLength;
-  $activeCount.textContent = uncompletedLength;
-
-  $completeAll.firstElementChild.checked = completedLength === todos.length;
+  $completeAll.firstElementChild.checked = completedTodos.length === todos.length;
 
   if (!todos.length) $completeAll.firstElementChild.checked = false;
 };
@@ -98,12 +97,13 @@ const removeTodo = id => {
 const removeAllCompleted = () => {
   todos = todos.filter(todo => !todo.completed);
   render();
-}
+};
 
 const navToggle = target => {
   [...$nav.children].forEach(nav => nav.classList.toggle('active', nav === target));
+  navState = target.id;
   render();
-}
+};
 
 document.addEventListener('DOMContentLoaded', fetchTodos);
 
@@ -127,4 +127,4 @@ $todoList.onclick = e => {
 
 $clearCompleted.onclick = () => removeAllCompleted();
 
-$nav.onclick = e => navToggle(e.target);
+$nav.onclick = e => navToggle(e.target)
