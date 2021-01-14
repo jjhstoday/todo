@@ -9,16 +9,12 @@ const $clearCompleted = document.querySelector('.clear-completed');
 const $completedCount = document.querySelector('.completed-todos');
 const $activeCount = document.querySelector('.active-todos');
 const $nav = document.querySelector('.nav');
-const $allNav = document.getElementById('all');
-const $activeNav = document.getElementById('active');
 
 const render = () => {
-  let todosNav = [];
-  
   const activeTodos = todos.filter(todo => !todo.completed);
   const completedTodos = todos.filter(todo => todo.completed);
   
-  todosNav = navState === 'all' ? todos : navState === 'active' ? activeTodos : completedTodos;
+  let todosNav = navState === 'all' ? todos : navState === 'active' ? activeTodos : completedTodos;
   
   const $fragment = document.createDocumentFragment();
 
