@@ -64,7 +64,7 @@ const ajax = (() => {
     xhr.send(JSON.stringify(payload));
 
     xhr.onload = () => {
-      if (xhr.status === 200 || xhr.status === 201) {
+      if (xhr.status === 200 || xhr.status === 201 || xhr.status === 204) {
         cb(JSON.parse(xhr.response));
         render();
       } else {
