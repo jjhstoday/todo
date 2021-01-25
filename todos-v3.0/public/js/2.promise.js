@@ -55,29 +55,56 @@ const render = () => {
 };
 
 // 서버 통신 using promise
-const promise = ((method, url, payload) => {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-
-    xhr.open(method, url);
-    if (method !== 'GET') xhr.setRequestHeader('content-type', 'application/json');
-    xhr.send(JSON.stringify(payload));
-
-    xhr.onload = () => {
-      if (xhr.status === 200 || xhr.status === 201 || xhr.status === 204) {
-        resolve(JSON.parse(xhr.response));
-      } else {
-        reject(new Error(xhr.status));
+const promise = (() => {
+  function request(method, url, payload) {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+  
+      xhr.open(method, url);
+      xhr.setRequestHeader('content-type', 'application/json');
+      xhr.send(JSON.stringify(payload));
+  
+      xhr.onload = () => {
+        if (xhr.status === 200 || xhr.status === 201 || xhr.status === 204) {
+          resolve(JSON.parse(xhr.response));
+        } else {
+          reject(new Error(xhr.status));
+        }
       }
+    })
+  }
+
+  return {
+    get(url, cb) {
+      return request('GET', url)
+      .then(cb)
+      .then(render)
+    },
+
+    post(url, cb, payload) {
+      return request('POST', url, payload)
+      .then(cb)
+      .then(render)
+    },
+
+    patch(url, cb, payload) {
+      return request('PATCH', url, payload)
+      .then(cb)
+      .then(render)
+    },
+
+    delete(url, cb) {
+      return request('DELETE', url)
+      .then(cb)
+      .then(render)
     }
-  })
-})
+  }
+})();
 
 const fetchTodos = () => {
-  promise('GET', '/todos')
-  .then(data => todos = [...data].sort((todo1, todo2) => todo2.id - todo1.id))
-  .then(() => render())
-  .catch(e => console.error(e));
+  const cb = data => todos = [...data].sort((todo1, todo2) => todo2.id - todo1.id);
+  
+  promise.get('/todos', cb);
 };
 
 const addTodo = (() => {
@@ -85,50 +112,41 @@ const addTodo = (() => {
   
   return content => {
     const payload = { id: generateId(), content, completed: false };
+    const cb = data => todos = [data, ...todos]
 
-    promise('POST', '/todos', payload)
-    .then(data => todos = [data, ...todos])
-    .then(() => render())
-    .catch(e => console.error(e)); 
+    promise.post('/todos', cb, payload);
   }
 })();
 
 const checkToggle = id => {
   const todo = todos.find(todo => todo.id === id);
   const payload = { ...todo, completed: !todo.completed };
+  const cb = data => todos = todos.map(todo => todo.id === data.id ? data : todo)
 
-  promise('PATCH', `/todos/${id}`, payload)
-  .then(data => todos = todos.map(todo => todo.id === data.id ? data : todo))
-  .then(() => render())
-  .catch(e => console.error(e)); 
+  promise.patch(`/todos/${id}`, cb, payload);
 };
 
 const checkAllToggle = checked => {
   todos = todos.map(todo => ({ ...todo, completed: checked }));
+  const cb = data => todos = todos.map(todo => ({ ...todo, data }));
 
   todos.forEach(todo => {
-    promise('PATCH', `/todos/${todo.id}`, { completed: checked })
-    .then(data => todos = todos.map(todo => ({ ...todo, data })))
-    .then(() => render())
-    .catch(e => console.error(e)); 
+    promise.patch(`/todos/${todo.id}`, cb, { completed: checked })
   })
 };
 
 const removeTodo = id => {
-  promise('DELETE', `/todos/${id}`)
-  .then(() => todos = todos.filter(todo => todo.id !== id))
-  .then(() => render())
-  .catch(e => console.error(e)); 
+  const cb = () => todos = todos.filter(todo => todo.id !== id);
+
+  promise.delete(`/todos/${id}`, cb);
 };
 
 const removeAllCompleted = () => {
   const completedTodos = todos.filter(todo => todo.completed);
+  const cb = () => todos = todos.filter(todo => !todo.completed);
 
   completedTodos.forEach(todo => {
-    promise('DELETE', `/todos/${todo.id}`)
-      .then(() => todos = todos.filter(todo => !todo.completed))
-      .then(() => render())
-      .catch(e => console.error(e));
+    promise.delete(`/todos/${todo.id}`, cb);
   })
 };
 
@@ -160,4 +178,4 @@ $todoList.onclick = e => {
 
 $clearCompleted.onclick = () => removeAllCompleted();
 
-$nav.onclick = e => navToggle(e.target)
+$nav.onclick = e => navToggle(e.target);
