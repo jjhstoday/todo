@@ -93,7 +93,7 @@ const ajax = (() => {
 })();
 
 const fetchTodos = () => {
-  const cb = data => todos = data;
+  const cb = data => todos = [...data].sort((todo1, todo2) => todo2.id - todo1.id);
 
   ajax.get('/todos', cb);
 };
