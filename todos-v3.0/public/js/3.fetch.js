@@ -128,7 +128,7 @@ const checkAllToggle = checked => {
 
   todos.forEach(todo => {
     request.patch(`/todos/${todo.id}`, { completed: checked })
-    .then(res => res.json())
+    // .then(res => res.json()) // TODO: 왜 없어도 되지..?
     .then(data => {
       todos = todos.map(todo => ({ ...todo, data }));
       render();
@@ -139,7 +139,6 @@ const checkAllToggle = checked => {
 
 const removeTodo = id => {
   request.delete(`/todos/${id}`)
-  .then(res => res.json())
   .then(() => {
     todos = todos.filter(todo => todo.id !== id);
     render();
@@ -152,7 +151,6 @@ const removeAllCompleted = () => {
 
   completedTodos.forEach(todo => {
     request.delete(`/todos/${todo.id}`)
-    .then(res => res.json())
     .then(() => {
       todos = todos.filter(todo => !todo.completed);
       render();
