@@ -13,7 +13,8 @@ const $nav = document.querySelector('.nav');
 // 서버 통신 using fetch
 const request = {
   get(url) {
-    return fetch(url);
+    return fetch(url)
+    .then(res => res.json());
   },
 
   post(url, payload) {
@@ -23,7 +24,8 @@ const request = {
         'content-Type': 'application/json'
       },
       body: JSON.stringify(payload)
-    });
+    })
+    .then(res => res.json());
   },
 
   patch(url, payload) {
@@ -33,13 +35,15 @@ const request = {
         'content-Type': 'application/json'
       },
       body: JSON.stringify(payload)
-    });
+    })
+    .then(res => res.json());
   },
 
   delete(url) {
     return fetch(url, {
       method: 'DELETE'
-    });
+    })
+    .then(res => res.json());
   }
 };
 
@@ -89,7 +93,6 @@ const render = () => {
 
 const fetchTodos = () => {
   request.get('/todos')
-  .then(res => res.json())
   .then(data => {
     todos = [...data].sort((todo1, todo2) => todo2.id - todo1.id);
     render();
@@ -102,7 +105,6 @@ const addTodo = (() => {
 
   return content => {
     request.post('/todos', { id: generateId(), content, completed: false })
-    .then(res => res.json())
     .then(data => {
       todos = [data, ...todos];
       render();
@@ -115,7 +117,6 @@ const checkToggle = id => {
   const todo = todos.find(todo => todo.id === id);
 
   request.patch(`/todos/${id}`, { ...todo, completed: !todo.completed })
-  .then(res => res.json())
   .then(data => {
     todos = todos.map(todo => todo.id === data.id ? data : todo);
     render();
@@ -128,7 +129,6 @@ const checkAllToggle = checked => {
 
   todos.forEach(todo => {
     request.patch(`/todos/${todo.id}`, { completed: checked })
-    // .then(res => res.json()) // TODO: 왜 없어도 되지..?
     .then(data => {
       todos = todos.map(todo => ({ ...todo, data }));
       render();
