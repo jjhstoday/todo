@@ -5,45 +5,61 @@ let navState = 'all';
 const async = (() => {
     return {
       async get(url, cb) {
+        try {
         const response = await fetch(url);
         const data = await response.json();
         const todos = await cb(data);
         render(todos);
+        } catch (err) {
+          console.error(err);
+        }
       },
   
       async post(url, cb, payload) {
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: {
-            'content-Type': 'application/json'
-          },
-          body: JSON.stringify(payload)
-        })
-        const data = await response.json();
-        const todos = await cb(data);
-        render(todos);
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          })
+          const data = await response.json();
+          const todos = await cb(data);
+          render(todos);
+        } catch (err) {
+          console.error(err);
+        }
       },
   
       async patch(url, cb, payload) {
-        const response = await fetch(url, {
-          method: 'PATCH',
-          headers: {
-            'content-Type': 'application/json'
-          },
-          body: JSON.stringify(payload)
-        })
-        const data = await response.json();
-        const todos = await cb(data);
-        render(todos);
+        try {
+          const response = await fetch(url, {
+            method: 'PATCH',
+            headers: {
+              'content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          })
+          const data = await response.json();
+          const todos = await cb(data);
+          render(todos);
+        } catch (err) {
+          console.error(err);
+        }
       },
   
       async delete(url, cb) {
-        const response = await fetch(url, {
-          method: 'DELETE'
-        })
-        const data = await response.json();
-        const todos = await cb(data);
-        render(todos);
+        try {
+          const response = await fetch(url, {
+            method: 'DELETE'
+          })
+          const data = await response.json();
+          const todos = await cb(data);
+          render(todos);
+        } catch (err) {
+          console.error(err);
+        }
       },
     }
 })();
@@ -104,8 +120,7 @@ const render = () => {
 const fetchTodos = () => {
   const cb = data => todos = [...data].sort((todo1, todo2) => todo2.id - todo1.id);
 
-  async.get('/todos', cb)
-  .catch(err => console.log(err));
+  async.get('/todos', cb);
 };
 
 const addTodo = (() => {
@@ -115,8 +130,7 @@ const addTodo = (() => {
     const cb = data => todos = [data, ...todos];
     const payload = { id: generateId(), content, completed: false };
 
-    async.post('/todos', cb, payload)
-    .catch(err => console.log(err));
+    async.post('/todos', cb, payload);
   }
 })();
 
@@ -125,8 +139,7 @@ const checkToggle = id => {
   const cb = data => todos = todos.map(todo => todo.id === data.id ? data : todo);
   const payload = { ...todo, completed: !todo.completed };
 
-  async.patch(`/todos/${id}`, cb, payload)
-  .catch(err => console.log(err));
+  async.patch(`/todos/${id}`, cb, payload);
 };
 
 const checkAllToggle = checked => {
@@ -135,16 +148,14 @@ const checkAllToggle = checked => {
   const payload = { completed: checked };
 
   todos.forEach(todo => {
-    async.patch(`/todos/${todo.id}`, cb, payload)
-    .catch(err => console.log(err));
+    async.patch(`/todos/${todo.id}`, cb, payload);
   })
 };
 
 const removeTodo = id => {
   const cb = () => todos = todos.filter(todo => todo.id !== id);
 
-  async.delete(`/todos/${id}`, cb)
-  .catch(err => console.log(err));
+  async.delete(`/todos/${id}`, cb);
 };
 
 const removeAllCompleted = () => {
@@ -152,8 +163,7 @@ const removeAllCompleted = () => {
   const cb = () => todos = todos.filter(todo => !todo.completed);
 
   completedTodos.forEach(todo => {
-    async.delete(`/todos/${todo.id}`, cb)
-    .catch(err => console.log(err));
+    async.delete(`/todos/${todo.id}`, cb);
   })
 };
 
