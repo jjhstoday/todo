@@ -97,6 +97,11 @@ const removeAllCompleted = () => {
 
 const navToggle = target => {
   [...$nav.children].forEach(nav => nav.classList.toggle('active', nav === target));
+
+  // forEach로 모든 요소를 다 볼 필요없이 할 수 있는 방법
+  // $nav.querySelector('.active').classList.remove('active');
+  // target.classList.add('active');
+
   navState = target.id;
   render();
 };
@@ -123,4 +128,8 @@ $todoList.onclick = e => {
 
 $clearCompleted.onclick = () => removeAllCompleted();
 
-$nav.onclick = e => navToggle(e.target)
+$nav.onclick = e => {
+  if (!e.target.matches('.nav > li')) return;
+
+  navToggle(e.target);
+}
